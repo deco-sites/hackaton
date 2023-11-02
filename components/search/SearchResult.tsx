@@ -1,5 +1,5 @@
 import { SendEventOnLoad } from "$store/components/Analytics.tsx";
-import { Layout as cardLayout } from "$store/components/product/ProductCard.tsx";
+import { Layout as CardLayout } from "$store/components/product/ProductCard.tsx";
 import Filters from "$store/components/search/Filters.tsx";
 import Icon from "$store/components/ui/Icon.tsx";
 import SearchControls from "$store/islands/SearchControls.tsx";
@@ -16,14 +16,14 @@ export interface Layout {
   /**
    * @description Number of products per line on grid
    */
-  columns: Columns;
+  columns?: Columns;
 }
 
 export interface Props {
   /** @title Integration */
   page: ProductListingPage | null;
   layout?: Layout;
-  cardLayout?: cardLayout;
+  cardLayout?: CardLayout;
 }
 
 function NotFound() {
@@ -40,6 +40,8 @@ function Result({
   cardLayout,
 }: Omit<Props, "page"> & { page: ProductListingPage }) {
   const { products, filters, breadcrumb, pageInfo, sortOptions } = page;
+  const perPage = pageInfo.recordPerPage || products.length;
+  const offset = pageInfo.currentPage * perPage;
 
   return (
     <>
@@ -58,7 +60,11 @@ function Result({
             </aside>
           )}
           <div class="flex-grow">
-            <ProductGallery products={products} layout={cardLayout} />
+            <ProductGallery
+              products={products}
+              offset={offset}
+              layout={{ card: cardLayout, columns: layout?.columns }}
+            />
           </div>
         </div>
 
@@ -93,9 +99,10 @@ function Result({
             // TODO: get category name from search or cms setting
             item_list_name: "",
             item_list_id: "",
-            items: page.products?.map((product) =>
+            items: page.products?.map((product, index) =>
               mapProductToAnalyticsItem({
                 ...(useOffer(product.offers)),
+                index: offset + index,
                 product,
                 breadcrumbList: page.breadcrumb,
               })

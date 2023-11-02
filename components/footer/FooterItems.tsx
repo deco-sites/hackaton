@@ -1,5 +1,5 @@
 import Icon, { AvailableIcons } from "$store/components/ui/Icon.tsx";
-import Divider from "$store/components/footer/Divider.tsx";
+
 export type Item = {
   label: string;
   href: string;
@@ -19,46 +19,23 @@ export default function FooterItems(
         <>
           {/* Tablet and Desktop view */}
           <ul
-            class={`hidden md:flex flex-row gap-6 lg:gap-14 ${
+            class={`hidden md:flex flex-row gap-6 lg:gap-10 ${
               justify && "lg:justify-between"
             }`}
           >
             {sections.map((section) => (
               <li>
-                <div class="flex flex-col gap-3">
-                  <span class="text-base text-[#000] font-bold uppercase">
+                <div class="flex flex-col gap-2">
+                  <span class="font-medium text-lg">
                     {section.label}
                   </span>
-                  <ul class={`flex flex-col gap-3 flex-wrap text-sm`}>
+                  <ul class={`flex flex-col gap-2 flex-wrap text-sm`}>
                     {section.items?.map((item) => (
-                      item.label.toLowerCase() ==
-                          "seja um franqueado".toLowerCase()
-                        ? (
-                          <li>
-                            <a
-                              href={item.href}
-                              class="text-white font-normal capitalize text-sm bg-black py-2 rounded-lg flex gap-3 items-center justify-center px-5 max-w-[220px]"
-                            >
-                              {item.label}
-                              <Icon
-                                width={24}
-                                height={24}
-                                strokeWidth={1}
-                                id="ArrowLeft"
-                              />
-                            </a>
-                          </li>
-                        )
-                        : (
-                          <li>
-                            <a
-                              href={item.href}
-                              class="text-[#8C8C8C] text-sm font-normal flex capitalize"
-                            >
-                              {item.label}
-                            </a>
-                          </li>
-                        )
+                      <li>
+                        <a href={item.href} class="block py-1 link link-hover">
+                          {item.label}
+                        </a>
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -67,61 +44,32 @@ export default function FooterItems(
           </ul>
 
           {/* Mobile view */}
-          <ul class="flex flex-col md:hidden ">
+          <ul class="flex flex-col md:hidden gap-4">
             {sections.map((section) => (
-              <>
-                <li>
-                  <details class="flex gap-3 flex-col group">
-                    <summary class="marker:content-none flex justify-center p-4 relative">
-                      <span class="text-base text-[#000] font-bold uppercase">
-                        {section.label}
-                      </span>
-                      <Icon
-                        width={24}
-                        height={24}
-                        strokeWidth={1}
-                        id="ArrowBlack"
-                        class="group-open:rotate-[180deg] absolute right-5"
-                      />
-                    </summary>
+              <li>
+                <div class="collapse collapse-arrow ">
+                  <input type="checkbox" class="min-h-[0]" />
+                  <div class="collapse-title min-h-[0] !p-0 flex gap-2">
+                    <span>{section.label}</span>
+                  </div>
+                  <div class="collapse-content">
                     <ul
-                      class={`flex flex-col gap-3 items-center pb-8`}
+                      class={`flex flex-col gap-1 pl-5 pt-2`}
                     >
                       {section.items?.map((item) => (
-                        item.label.toLowerCase() ==
-                            "seja um franqueado".toLowerCase()
-                          ? (
-                            <li>
-                              <a
-                                href={item.href}
-                                class="text-white font-normal capitalize text-sm bg-black py-2 rounded-lg px-5 flex gap-3 items-center justify-center max-w-[220px]"
-                              >
-                                {item.label}
-                                <Icon
-                                  width={24}
-                                  height={24}
-                                  strokeWidth={1}
-                                  id="ArrowLeft"
-                                />
-                              </a>
-                            </li>
-                          )
-                          : (
-                            <li>
-                              <a
-                                href={item.href}
-                                class="text-[#8C8C8C] text-sm font-normal flex justify-center capitalize"
-                              >
-                                {item.label}
-                              </a>
-                            </li>
-                          )
+                        <li>
+                          <a
+                            href={item.href}
+                            class="block py-1 link link-hover"
+                          >
+                            {item.label}
+                          </a>
+                        </li>
                       ))}
                     </ul>
-                  </details>
-                </li>
-                <Divider />
-              </>
+                  </div>
+                </div>
+              </li>
             ))}
           </ul>
         </>

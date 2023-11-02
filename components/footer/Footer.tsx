@@ -3,9 +3,6 @@ import ColorClasses from "$store/components/footer/ColorClasses.tsx";
 import Divider from "$store/components/footer/Divider.tsx";
 import ExtraLinks from "$store/components/footer/ExtraLinks.tsx";
 import FooterItems from "$store/components/footer/FooterItems.tsx";
-import FooterItemInfo, {
-  SectionInfo,
-} from "$store/components/footer/FooterItemInfo.tsx";
 import Logo from "$store/components/footer/Logo.tsx";
 import MobileApps from "$store/components/footer/MobileApps.tsx";
 import PaymentMethods from "$store/components/footer/PaymentMethods.tsx";
@@ -37,20 +34,10 @@ export interface SocialItem {
 }
 
 export interface PaymentItem {
-  label:
-    | "Diners"
-    | "Elo"
-    | "Mastercard"
-    | "Pix"
-    | "Visa"
-    | "Amex"
-    | "Hipercard"
-    | "Ame"
-    | "Cashback";
+  label: "Diners" | "Elo" | "Mastercard" | "Pix" | "Visa";
 }
 
 export interface MobileApps {
-  title?: string;
   /** @description Link to the app */
   apple?: string;
   /** @description Link to the app */
@@ -86,7 +73,6 @@ export interface Layout {
     logo?: boolean;
     newsletter?: boolean;
     sectionLinks?: boolean;
-    sectionInfo?: boolean;
     socialLinks?: boolean;
     paymentMethods?: boolean;
     mobileApps?: boolean;
@@ -108,7 +94,6 @@ export interface Props {
     form?: NewsletterForm;
   };
   sections?: Section[];
-  sectionsInfo?: SectionInfo[];
   social?: {
     title?: string;
     items: SocialItem[];
@@ -166,23 +151,6 @@ function Footer({
       },
     ],
   }],
-  sectionsInfo = [{
-    "label": "Sobre",
-    "items": [
-      {
-        "href": "/quem-somos",
-        "label": "Quem somos",
-      },
-      {
-        "href": "/termos-de-uso",
-        "label": "Termos de uso",
-      },
-      {
-        "href": "/trabalhe-conosco",
-        "label": "Trabalhe conosco",
-      },
-    ],
-  }],
   social = {
     title: "Redes sociais",
     items: [{ label: "Instagram", link: "/" }, { label: "Tiktok", link: "/" }],
@@ -191,7 +159,7 @@ function Footer({
     title: "Formas de pagamento",
     items: [{ label: "Mastercard" }, { label: "Visa" }, { label: "Pix" }],
   },
-  mobileApps = { title: "Nossos Apps", apple: "/", android: "/" },
+  mobileApps = { apple: "/", android: "/" },
   regionOptions = { currency: [], language: [] },
   extraLinks = [],
   backToTheTop,
@@ -212,27 +180,20 @@ function Footer({
   },
 }: Props) {
   const _logo = layout?.hide?.logo ? <></> : <Logo logo={logo} />;
-  // const _newsletter = layout?.hide?.newsletter ? <></> : (
-  //   <Newsletter
-  //     content={newsletter}
-  //     layout={{
-  //       tiled: layout?.variation == "Variation 4" ||
-  //         layout?.variation == "Variation 5",
-  //     }}
-  //   />
-  // );
-  const _sectionLinks = layout?.hide?.sectionInfo ? <></> : (
+  const _newsletter = layout?.hide?.newsletter ? <></> : (
+    <Newsletter
+      content={newsletter}
+      layout={{
+        tiled: layout?.variation == "Variation 4" ||
+          layout?.variation == "Variation 5",
+      }}
+    />
+  );
+  const _sectionLinks = layout?.hide?.sectionLinks ? <></> : (
     <FooterItems
       sections={sections}
       justify={layout?.variation == "Variation 2" ||
         layout?.variation == "Variation 3"}
-    />
-  );
-  const _sectionInfoFooter = layout?.hide?.sectionInfo ? <></> : (
-    <FooterItemInfo
-      sectionsInfo={sectionsInfo}
-      justify={layout?.variation == "Variation 1" ||
-        layout?.variation == "Variation 2"}
     />
   );
   const _social = layout?.hide?.socialLinks
@@ -252,37 +213,32 @@ function Footer({
     : <ExtraLinks content={extraLinks} />;
 
   return (
-    <footer class="w-full flex flex-col pt-10 pb-2 md:pb-10 gap-10 bg-[#F5F5F5]">
-      <div class="lg:container lg:mx-auto md:px-10">
+    <footer
+      class={`w-full flex flex-col pt-10 pb-2 md:pb-10 gap-10 ${
+        ColorClasses(layout)
+      }`}
+    >
+      <div class="lg:container mx-6 lg:mx-auto">
         {(!layout?.variation || layout?.variation == "Variation 1") && (
-          <div class="flex flex-col">
-            <div>
+          <div class="flex flex-col gap-10">
+            <div class="flex flex-col md:flex-row md:justify-between md:flex-wrap lg:flex-nowrap gap-8 lg:gap-12">
               {_logo}
+              {_sectionLinks}
+              {_newsletter}
             </div>
-            <div class="flex flex-col md:flex-row md:justify-between lg:grid lg:grid-cols-5 md:pb-14">
-              <div class="md:hidden">{_sectionInfoFooter} {_social}</div>
-              <div class="col-span-3">{_sectionLinks}</div>
-              <div class="hidden md:flex md:col-span-1">
-                {_sectionInfoFooter}
-              </div>
-              <div class="md:col-span-1 md:mx-auto">
-                {_apps} <div class="hidden md:flex">{_social}</div>
-              </div>
-            </div>
-            <div class="hidden md:flex">
-              <Divider />
-            </div>
-
-            <div class="flex flex-col md:pt-5">
+            <Divider />
+            <div class="flex flex-col md:flex-row gap-10 md:gap-14 md:items-end">
               {_payments}
+              {_social}
+              <div class="flex flex-col lg:flex-row gap-10 lg:gap-14 lg:items-end">
+                {_apps}
+                {_region}
+              </div>
             </div>
-
-            <div class="flex justify-center mt-6 px-4 pb-5">
-              <p class="text-center text-[10px] uppercase font-medium text-[#9A9A9A] w-[550px]">
-                Wicomm COMERCIO DE ARTIGOS DE COURO LTDA CNPJ:
-                12.150.996/0002-81 I.E: 86.863.120 RUA FONSECA TELES,54 SL 201 E
-                GALPÃO SÃO CRISTOVÃO - RIO DE JANEIRO - RJ CEP: 20940-200
-              </p>
+            <Divider />
+            <div class="flex flex-col-reverse md:flex-row md:justify-between gap-10">
+              <PoweredByDeco />
+              {_links}
             </div>
           </div>
         )}
@@ -297,7 +253,7 @@ function Footer({
                 {_region}
               </div>
               <div class="flex flex-col gap-10 lg:gap-20 lg:w-1/2 lg:pr-10">
-                {/* {_newsletter} */}
+                {_newsletter}
                 {_sectionLinks}
               </div>
             </div>
@@ -313,7 +269,7 @@ function Footer({
             {_logo}
             <div class="flex flex-col lg:flex-row gap-14">
               <div class="flex flex-col md:flex-row lg:flex-col md:justify-between lg:justify-normal gap-10 lg:w-2/5">
-                {/* {_newsletter} */}
+                {_newsletter}
                 <div class="flex flex-col gap-10">
                   {_payments}
                   {_apps}
@@ -336,8 +292,8 @@ function Footer({
         )}
         {layout?.variation == "Variation 4" && (
           <div class="flex flex-col gap-10">
-            {/* {_newsletter} */}
-            {/* {layout?.hide?.newsletter ? <></> : <Divider />} */}
+            {_newsletter}
+            {layout?.hide?.newsletter ? <></> : <Divider />}
             <div class="flex flex-col lg:flex-row gap-10 lg:gap-20 lg:justify-between">
               {_sectionLinks}
               <div class="flex flex-col md:flex-row lg:flex-col gap-10 lg:gap-10 lg:w-2/5 lg:pl-10">
@@ -364,8 +320,8 @@ function Footer({
         )}
         {layout?.variation == "Variation 5" && (
           <div class="flex flex-col gap-10">
-            {/* {_newsletter} */}
-            {/* {layout?.hide?.newsletter ? <></> : <Divider />} */}
+            {_newsletter}
+            {layout?.hide?.newsletter ? <></> : <Divider />}
             {_logo}
             <div class="flex flex-col md:flex-row gap-10 lg:gap-20 md:justify-between">
               {_sectionLinks}
@@ -386,11 +342,9 @@ function Footer({
           </div>
         )}
       </div>
-      {
-        /* {layout?.hide?.backToTheTop
+      {layout?.hide?.backToTheTop
         ? <></>
-        : <BackToTop content={backToTheTop?.text} />} */
-      }
+        : <BackToTop content={backToTheTop?.text} />}
     </footer>
   );
 }

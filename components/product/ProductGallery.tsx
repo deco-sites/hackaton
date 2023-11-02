@@ -1,41 +1,51 @@
-import { Product } from "apps/commerce/types.ts";
-
 import ProductCard, {
-  Layout as cardLayout,
+  Layout as CardLayout,
 } from "$store/components/product/ProductCard.tsx";
 import { usePlatform } from "$store/sdk/usePlatform.tsx";
+import { Product } from "apps/commerce/types.ts";
 
 export interface Columns {
-  mobile?: number;
-  desktop?: number;
+  mobile?: 1 | 2;
+  desktop?: 2 | 3 | 4 | 5;
 }
 
 export interface Props {
-  title?: string;
   products: Product[] | null;
-  layout?: cardLayout;
+  offset: number;
+  layout?: {
+    card?: CardLayout;
+    columns?: Columns;
+  };
 }
 
-function ProductGallery({ products, layout, title}: Props) {
+const MOBILE_COLUMNS = {
+  1: "grid-cols-1",
+  2: "grid-cols-2",
+};
+
+const DESKTOP_COLUMNS = {
+  2: "sm:grid-cols-2",
+  3: "sm:grid-cols-3",
+  4: "sm:grid-cols-4",
+  5: "sm:grid-cols-5",
+};
+
+function ProductGallery({ products, layout, offset }: Props) {
   const platform = usePlatform();
+  const mobile = MOBILE_COLUMNS[layout?.columns?.mobile ?? 2];
+  const desktop = DESKTOP_COLUMNS[layout?.columns?.desktop ?? 4];
+
   return (
-    <div class=" container lg:max-w-[1200px] max-w-[95%] flex flex-col items-center lg:items-start mt-8 lg:mt-16 gap-6 lg:gap-12">
-      {
-        title &&  (
-          <h3 class={"lg:text-4xl font-semibold uppercase text-primary-content text-base "}>{title}</h3>
-        )
-      }
-      <div class="w-full grid grid-cols-2 gap-2 items-center sm:grid-cols-4 sm:gap-10">
-        {products?.map((product, index) => (
-          <ProductCard
-            product={product}
-            preload={index === 0}
-            layout={layout}
-            platform={platform}
-          />
-        ))}
-      </div>
-      
+    <div class={`grid ${mobile} gap-2 items-center ${desktop} sm:gap-10`}>
+      {products?.map((product, index) => (
+        <ProductCard
+          product={product}
+          preload={index === 0}
+          index={offset + index}
+          layout={layout?.card}
+          platform={platform}
+        />
+      ))}
     </div>
   );
 }

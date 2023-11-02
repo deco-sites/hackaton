@@ -20,6 +20,10 @@ export interface Banner {
     /** @description when user clicks on the image, go to this link */
     href: string;
     /** @description Image text title */
+    title: string;
+    /** @description Image text subtitle */
+    subTitle: string;
+    /** @description Button label */
     label: string;
   };
 }
@@ -45,10 +49,12 @@ const DEFAULT_PROPS = {
         href: "https://www.deco.cx/",
         label: "deco.cx",
         title: "Demo Store",
-        subTitle: "Visit our site and start building now:"
+        subTitle: "Visit our site and start building now:",
       },
-      mobile: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/24278f9e-412d-4a8a-b2d3-57353bb1b368",
-      desktop: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/afa2c07c-74f4-496d-8647-5cc58f48117b"
+      mobile:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/24278f9e-412d-4a8a-b2d3-57353bb1b368",
+      desktop:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/afa2c07c-74f4-496d-8647-5cc58f48117b",
     },
     {
       alt: "/feminino",
@@ -56,10 +62,12 @@ const DEFAULT_PROPS = {
         href: "https://www.deco.cx/",
         label: "deco.cx",
         title: "Demo Store",
-        subTitle: "Visit our site and start building now:"
+        subTitle: "Visit our site and start building now:",
       },
-      mobile: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/eeaa624c-a3e1-45e8-a6fe-034233cfbcd0",
-      desktop: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/7949d031-9a79-4639-b85e-62fd90af85a9"
+      mobile:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/eeaa624c-a3e1-45e8-a6fe-034233cfbcd0",
+      desktop:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/7949d031-9a79-4639-b85e-62fd90af85a9",
     },
     {
       alt: "/feminino",
@@ -67,14 +75,16 @@ const DEFAULT_PROPS = {
         href: "https://www.deco.cx/",
         label: "deco.cx",
         title: "Demo Store",
-        subTitle: "Visit our site and start building now:"
+        subTitle: "Visit our site and start building now:",
       },
-      mobile: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/ae89571c-4a7c-44bf-9aeb-a341fd049d19",
-      desktop: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/7ec121e4-5cfe-4b7b-b942-d1ed4493803d"
-    }
+      mobile:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/ae89571c-4a7c-44bf-9aeb-a341fd049d19",
+      desktop:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/7ec121e4-5cfe-4b7b-b942-d1ed4493803d",
+    },
   ],
-  preload: true
-}
+  preload: true,
+};
 
 function BannerItem({ image, lcp }: { image: Banner; lcp?: boolean }) {
   const {
@@ -112,6 +122,17 @@ function BannerItem({ image, lcp }: { image: Banner; lcp?: boolean }) {
           alt={alt}
         />
       </Picture>
+      {action && (
+        <div class="absolute h-min top-0 bottom-0 m-auto left-0 right-0 sm:right-auto sm:left-[12%] max-h-min max-w-[235px] flex flex-col gap-4 p-4 rounded glass">
+          <span class="text-6xl font-medium text-base-100">
+            {action.title}
+          </span>
+          <span class="font-medium text-xl text-base-100">
+            {action.subTitle}
+          </span>
+          <Button class="glass">{action.label}</Button>
+        </div>
+      )}
     </a>
   );
 }
@@ -136,7 +157,7 @@ function Dots({ images, interval = 0 }: Props) {
             <Slider.Dot index={index}>
               <div class="py-5">
                 <div
-                  class="w-[10px] h-[10px] rounded-full bg-[#8C8C8C] group-disabled:bg-white"
+                  class="w-16 sm:w-20 h-0.5 rounded group-disabled:animate-progress bg-gradient-to-r from-base-100 from-[length:var(--dot-progress)] to-[rgba(255,255,255,0.4)] to-[length:var(--dot-progress)]"
                   style={{ animationDuration: `${interval}s` }}
                 />
               </div>
@@ -175,8 +196,8 @@ function Buttons() {
   );
 }
 
-function BannerCarousel(props : Props) {
-  const { images, preload, interval } = {...DEFAULT_PROPS, ...props}
+function BannerCarousel(props: Props) {
+  const { images, preload, interval } = { ...DEFAULT_PROPS, ...props };
 
   const id = useId();
 
@@ -193,6 +214,7 @@ function BannerCarousel(props : Props) {
         ))}
       </Slider>
 
+      <Buttons />
 
       <Dots images={images} interval={interval} />
 

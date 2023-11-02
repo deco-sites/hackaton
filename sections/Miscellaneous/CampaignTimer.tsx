@@ -2,13 +2,6 @@ import { useId } from "$store/sdk/useId.ts";
 import type { HTMLWidget } from "apps/admin/widgets.ts";
 
 export interface Props {
-
-    /**
-   * @title Text
-   * @default Time left for a campaign to end wth a link
-   */
-    title?: HTMLWidget;
-
   /**
    * @title Text
    * @default Time left for a campaign to end wth a link
@@ -26,7 +19,6 @@ export interface Props {
      * @title Text to show when expired
      */
     expired?: string;
-    days?:string;
     hours?: string;
     minutes?: string;
     seconds?: string;
@@ -65,8 +57,7 @@ const snippet = (expiresAt: string, rootId: string) => {
     const totalHours = (days * 24) + hours;
 
     return {
-      days,
-      hours: Math.min(totalHours, 23),
+      hours: Math.min(totalHours, 99),
       minutes,
       seconds,
     };
@@ -82,8 +73,8 @@ const snippet = (expiresAt: string, rootId: string) => {
 
   const start = () =>
     setInterval(() => {
-      const { days, hours, minutes, seconds } = getDelta();
-      const isExpired = days + hours + minutes + seconds < 0;
+      const { hours, minutes, seconds } = getDelta();
+      const isExpired = hours + minutes + seconds < 0;
 
       if (isExpired) {
         const expired = document.getElementById(`${rootId}::expired`);
@@ -92,12 +83,11 @@ const snippet = (expiresAt: string, rootId: string) => {
         expired && expired.classList.remove("hidden");
         counter && counter.classList.add("hidden");
       } else {
-        setValue(`${rootId}::days`, days);
         setValue(`${rootId}::hours`, hours);
         setValue(`${rootId}::minutes`, minutes);
         setValue(`${rootId}::seconds`, seconds);
       }
-    }, 1000);
+    }, 1_000);
 
   document.readyState === "complete"
     ? start()
@@ -108,7 +98,6 @@ function CampaignTimer({
   expiresAt = `${new Date()}`,
   labels,
   text = "Time left for a campaign to end wth a link",
-  title = "",
   link = { text: "Click me", href: "/hello" },
   layout = { textPosition: "Before counter" },
 }: Props) {
@@ -116,52 +105,48 @@ function CampaignTimer({
 
   return (
     <>
-      <div class=" container flex justify-center flex-col items-center lg:my-16 mt-6 mb-8 lg:max-w-[1200px] rounded-lg text-accent-content">
-        {title && (
-          <div class="text-2xl text-center justify-center lg:text-3xl font-bold lg:mb-10 mb-8 flex lg:max-w-lg text-base-content" dangerouslySetInnerHTML={{ __html: title }}/> 
-        )}
-        <div class="container bg-base-200 max-w-[90%] md:max-w-full mx-auto flex flex-col rounded-lg  lg:items-center lg:justify-center gap-3 py-4 px-6  ">
+      <div class="bg-accent text-accent-content">
+        <div class="container mx-auto flex flex-col lg:flex-row lg:items-center lg:justify-center lg:gap-16 py-4 px-6 gap-4 ">
           {layout?.textPosition !== "After counter" &&
             (
               <div
-                class="lg:text-sm text-xs text-center  lg:max-w-lg"
+                class="text-sm text-center lg:text-xl lg:text-left lg:max-w-lg"
                 dangerouslySetInnerHTML={{ __html: text }}
               >
               </div>
             )}
           <div
             id={`${id}::expired`}
-            class="hidden text-sm text-center  lg:max-w-lg"
+            class="hidden text-sm text-center lg:text-xl lg:text-left lg:max-w-lg"
           >
             {labels?.expired || "Expired!"}
           </div>
-          <div class="flex flex-col items-center gap-8 lg:gap-16 justify-center lg:justify-normal">
+          <div class="flex gap-8 lg:gap-16 items-center justify-center lg:justify-normal">
             <div id={`${id}::counter`}>
-              <div class="grid grid-flow-col gap-8 lg:gap-10 text-center auto-cols-max items-center">
-                <div class="flex flex-col text-[10px] lg:text-xs items-center justify-center">
-                  <span class="countdown font-bold text-xl lg:text-3xl">
-                    <span id={`${id}::days`} />
-                  </span>
-                  {labels?.days || "dias"}
-                </div>
-             
-                <div class="flex flex-col text-[10px] lg:text-xs items-center justify-center">
-                  <span class="countdown font-bold text-xl lg:text-3xl">
+              <div class="grid grid-flow-col gap-3 text-center auto-cols-max items-center">
+                <div class="flex flex-col text-xs lg:text-sm">
+                  <span class="countdown font-normal text-xl lg:text-2xl">
                     <span id={`${id}::hours`} />
                   </span>
-                  {labels?.hours || "horas"}
+                  {labels?.hours || ""}
                 </div>
-                <div class="flex flex-col text-[10px] lg:text-xs items-center justify-center">
-                  <span class="countdown font-bold text-xl lg:text-3xl">
+                <div>
+                  :
+                </div>
+                <div class="flex flex-col text-xs lg:text-sm">
+                  <span class="countdown font-normal text-xl lg:text-2xl">
                     <span id={`${id}::minutes`} />
                   </span>
-                  {labels?.minutes || "minutos"}
+                  {labels?.minutes || ""}
                 </div>
-                <div class="flex flex-col text-[10px] lg:text-xs items-center justify-center">
-                  <span class="countdown font-bold text-xl lg:text-3xl">
+                <div>
+                  :
+                </div>
+                <div class="flex flex-col text-xs lg:text-sm">
+                  <span class="countdown font-normal text-xl lg:text-2xl">
                     <span id={`${id}::seconds`} />
                   </span>
-                  {labels?.seconds || "segundos"}
+                  {labels?.seconds || ""}
                 </div>
               </div>
             </div>
@@ -174,9 +159,16 @@ function CampaignTimer({
               dangerouslySetInnerHTML={{ __html: text }}
             >
             </div>
+            <a
+              class="btn"
+              aria-label={link.text}
+              href={link.href}
+            >
+              {link.text}
+            </a>
           </div>
           <div
-            class={`lg:hidden lg:text-sm text-xs text-center  lg:text-left lg:max-w-lg ${
+            class={`lg:hidden text-sm text-center lg:text-xl lg:text-left lg:max-w-lg ${
               layout?.textPosition === "After counter" ? "block" : "hidden"
             }`}
             dangerouslySetInnerHTML={{ __html: text }}

@@ -1,14 +1,13 @@
+import type { Platform } from "$store/apps/site.ts";
 import { SendEventOnClick } from "$store/components/Analytics.tsx";
 import Avatar from "$store/components/ui/Avatar.tsx";
 import WishlistButton from "$store/islands/WishlistButton.tsx";
 import { formatPrice } from "$store/sdk/format.ts";
 import { useOffer } from "$store/sdk/useOffer.ts";
-import { usePlatform } from "$store/sdk/usePlatform.tsx";
 import { useVariantPossibilities } from "$store/sdk/useVariantPossiblities.ts";
 import type { Product } from "apps/commerce/types.ts";
 import { mapProductToAnalyticsItem } from "apps/commerce/utils/productToAnalyticsItem.ts";
 import Image from "apps/website/components/Image.tsx";
-import AddToCartButtonVTEX from "$store/islands/AddToCartButton/vtex.tsx";
 
 export interface Layout {
   basics?: {
@@ -45,22 +44,24 @@ interface Props {
 
   /** @description used for analytics event */
   itemListName?: string;
-  layout?: Layout;
 
-  platform: ReturnType<typeof usePlatform>;
+  /** @description index of the product card in the list */
+  index?: number;
+
+  layout?: Layout;
+  platform?: Platform;
 }
 
 const relative = (url: string) => {
   const link = new URL(url);
-
   return `${link.pathname}${link.search}`;
 };
 
-const WIDTH = 282;
-const HEIGHT = 363;
+const WIDTH = 200;
+const HEIGHT = 279;
 
 function ProductCard(
-  { product, preload, itemListName, layout, platform }: Props,
+  { product, preload, itemListName, layout, platform, index }: Props,
 ) {
   const {
     url,
@@ -70,16 +71,13 @@ function ProductCard(
     offers,
     isVariantOf,
   } = product;
-
-  const description = product.description || isVariantOf?.description;
   const id = `product-card-${productID}`;
+  const hasVariant = isVariantOf?.hasVariant ?? [];
   const productGroupID = isVariantOf?.productGroupID;
+  const description = product.description || isVariantOf?.description;
   const [front, back] = images ?? [];
-  const { listPrice, price, installments, seller = "1" } = useOffer(offers);
-  let discount;
-  if (listPrice && price) discount = Math.floor((price / listPrice) * 100);
-
-  const possibilities = useVariantPossibilities(product);
+  const { listPrice, price, installments } = useOffer(offers);
+  const possibilities = useVariantPossibilities(hasVariant, product);
   const variants = Object.entries(Object.values(possibilities)[0] ?? {});
 
   const l = layout;
@@ -87,11 +85,11 @@ function ProductCard(
     !l?.basics?.contentAlignment || l?.basics?.contentAlignment == "Left"
       ? "left"
       : "center";
-  const skuSelector = variants.map(([value, [link]]) => (
+  const skuSelector = variants.map(([value, link]) => (
     <li>
-      <a href={link && relative(link)}>
+      <a href={link}>
         <Avatar
-          variant={link === url ? "active" : "default"}
+          variant={link === url ? "active" : link ? "default" : "disabled"}
           content={value}
         />
       </a>
@@ -101,7 +99,7 @@ function ProductCard(
     <a
       href={url && relative(url)}
       aria-label="view product"
-      class="btn btn-block text-base-100"
+      class="btn btn-block"
     >
       {l?.basics?.ctaText || "Ver produto"}
     </a>
@@ -110,7 +108,7 @@ function ProductCard(
   return (
     <div
       id={id}
-      class={`card col-span-1 card-compact group w-full ${
+      class={`card card-compact group w-full ${
         align === "center" ? "text-center" : "text-start"
       } ${l?.onMouseOver?.showCardShadow ? "lg:hover:card-bordered" : ""}
         ${
@@ -131,6 +129,7 @@ function ProductCard(
                 product,
                 price,
                 listPrice,
+                index,
               }),
             ],
           },
@@ -140,14 +139,28 @@ function ProductCard(
         class="relative overflow-hidden"
         style={{ aspectRatio: `${WIDTH} / ${HEIGHT}` }}
       >
-        {discount &&
-          (
-            <span
-              class={"absolute top-0 left-0  rounded-[48px] py-2 px-4 bg-secondary text-white text-[10px] lg:text-sm font-black"}
-            >
-              {discount}% OFF
-            </span>
+        {/* Wishlist button */}
+        <div
+          class={`absolute top-2 z-10
+          ${
+            l?.elementsPositions?.favoriteIcon === "Top left"
+              ? "left-2"
+              : "right-2"
+          }
+          ${
+            l?.onMouseOver?.showFavoriteIcon
+              ? "lg:hidden lg:group-hover:block"
+              : "lg:hidden"
+          }
+        `}
+        >
+          {platform === "vtex" && (
+            <WishlistButton
+              productGroupID={productGroupID}
+              productID={productID}
+            />
           )}
+        </div>
         {/* Product Images */}
         <a
           href={url && relative(url)}
@@ -224,8 +237,14 @@ function ProductCard(
             <div class="flex flex-col gap-0">
               {l?.hide?.productName ? "" : (
                 <h2
-                  class=" text-base lg:text-xl text-base-content"
+                  class="truncate text-base lg:text-lg text-base-content"
                   dangerouslySetInnerHTML={{ __html: name ?? "" }}
+                />
+              )}
+              {l?.hide?.productDescription ? "" : (
+                <div
+                  class="truncate text-sm lg:text-sm text-neutral"
+                  dangerouslySetInnerHTML={{ __html: description ?? "" }}
                 />
               )}
             </div>
@@ -240,21 +259,21 @@ function ProductCard(
               } ${align === "center" ? "justify-center" : "justify-start"}`}
             >
               <div
-                class={`line-through text-base-300 ${
+                class={`line-through text-base-300 text-xs ${
                   l?.basics?.oldPriceSize === "Normal" ? "lg:text-xl" : ""
                 }`}
               >
                 {formatPrice(listPrice, offers?.priceCurrency)}
               </div>
-              <div class="text-primary text-base lg:text-2xl font-bold">
+              <div class="text-accent text-base lg:text-xl">
                 {formatPrice(price, offers?.priceCurrency)}
               </div>
             </div>
             {l?.hide?.installments
               ? ""
               : (
-                <div class="text-base-300 text-sm lg:text-base">
-                  {installments}
+                <div class="text-base-300 text-sm lg:text-base truncate">
+                  ou {installments}
                 </div>
               )}
           </div>
@@ -286,19 +305,6 @@ function ProductCard(
             </div>
           )
           : ""}
-
-        {platform === "vtex" && (
-          <>
-            <AddToCartButtonVTEX
-              name={name || ""}
-              productID={productID}
-              productGroupID={productGroupID || ""}
-              price={price || 0}
-              discount={discount || 0}
-              seller={seller}
-            />
-          </>
-        )}
       </div>
     </div>
   );

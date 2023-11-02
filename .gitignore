@@ -62,16 +62,14 @@ yarn-error.log
 .pnp.js
 # Yarn Integrity file
 .yarn-integrity
-yarn.lock
 
 dist/
 server/
 
 import_map.local.json
-deno.lock
-
 # db files
 .config.json
+# Fresh build directory
+_fresh/
 
-#tailwind
-tailwind.config.js
+deno.lock

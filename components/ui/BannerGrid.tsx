@@ -86,42 +86,45 @@ const RADIUS_DESKTOP = {
 };
 
 const DEFAULT_PROPS: Props = {
-  title: "",
+  title: "Summer bags",
   banners: [
     {
       alt: "a",
       href: "a",
-      srcMobile: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/82727553-f670-4e7c-b9c2-9452aed1955f",
-      srcDesktop: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/7b3a9d75-57a5-43cf-a3c5-f689a997f24e"
+      srcMobile:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/82727553-f670-4e7c-b9c2-9452aed1955f",
+      srcDesktop:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/7b3a9d75-57a5-43cf-a3c5-f689a997f24e",
     },
     {
       alt: "a",
       href: "a",
-      srcMobile: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/c5c6bdf6-5555-488c-8b14-719e4158dea6",
-      srcDesktop: "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/3e2b7824-d75c-4704-8d32-621bfc9b20cf"
-    }
+      srcMobile:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/c5c6bdf6-5555-488c-8b14-719e4158dea6",
+      srcDesktop:
+        "https://ozksgdmyrqcxcwhnbepg.supabase.co/storage/v1/object/public/assets/239/3e2b7824-d75c-4704-8d32-621bfc9b20cf",
+    },
   ],
   borderRadius: {
     mobile: "3xl",
-    desktop: "3xl"
+    desktop: "3xl",
   },
   itemsPerLine: {
     mobile: 2,
-    desktop: 2
+    desktop: 2,
   },
 };
 
 export default function BannnerGrid(props: Props) {
-
   const {
     title,
     itemsPerLine,
     borderRadius,
     banners = [],
-  } = {...DEFAULT_PROPS, ...props}
+  } = { ...DEFAULT_PROPS, ...props };
 
   return (
-    <section class="container w-full max-w-[1200px] px-4 md:px-0 mx-auto mt-16">
+    <section class="container w-full px-4 md:px-0 mx-auto">
       {title &&
         (
           <div class="py-6 md:py-0 md:pb-[40px] flex items-center mt-6">
@@ -133,12 +136,14 @@ export default function BannnerGrid(props: Props) {
           </div>
         )}
       <div
-        class={`w-full lg:grid  lg:grid-cols-2 lg:gap-6 flex flex-wrap gap-3`}
+        class={`grid gap-4 md:gap-6 ${
+          MOBILE_COLUMNS[itemsPerLine?.mobile ?? 2]
+        } ${DESKTOP_COLUMNS[itemsPerLine?.desktop ?? 4]}`}
       >
         {banners.map(({ href, srcMobile, srcDesktop, alt }) => (
           <a
             href={href}
-            class={`col-span-1 w-full  ${
+            class={`overflow-hidden ${
               RADIUS_MOBILE[borderRadius.mobile ?? "none"]
             } ${RADIUS_DESKTOP[borderRadius.desktop ?? "none"]} `}
           >
@@ -146,14 +151,14 @@ export default function BannnerGrid(props: Props) {
               <Source
                 media="(max-width: 767px)"
                 src={srcMobile}
-                width={375}
-                height={140}
+                width={100}
+                height={100}
               />
               <Source
                 media="(min-width: 768px)"
                 src={srcDesktop ? srcDesktop : srcMobile}
-                width={588}
-                height={221}
+                width={250}
+                height={250}
               />
               <img
                 class="w-full"
